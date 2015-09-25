@@ -130,18 +130,24 @@ sap.ui.require(['ToolsAPI'], function (ToolsAPI) {
             var newValue = data.value;
 
             var control = sap.ui.getCore().byId(controlId);
-            if (control) {
-                // Change the property through its setter
-                control['set' + property](newValue);
 
-                // Update properties and bindings
+            try {
+                if (control) {
+                    // Change the property through its setter
+                    control['set' + property](newValue);
+                }
+            } catch (error) {
+                // Update properties and bindings after an error
                 var controlProperties = ToolsAPI.getControlProperties(controlId);
                 var controlBindings = ToolsAPI.getControlBindings(controlId);
+
                 message.send({
                     action: 'on-control-select',
                     controlProperties: controlUtils.getControlPropertiesFormattedForDataView(controlId, controlProperties),
                     controlBindings: controlUtils.getControlBindingsFormattedForDataView(controlBindings)
                 });
+
+                console.error(error);
             }
         }
     };
